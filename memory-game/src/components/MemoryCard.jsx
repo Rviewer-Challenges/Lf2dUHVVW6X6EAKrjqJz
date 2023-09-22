@@ -1,10 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 
 export function MemoryCard({ position }) {
+  const [isVisible, setIsVisible] = useState(false);
   const [x, y] = position;
+
+  const toggleVisibility = () => {
+    setIsVisible(!isVisible);
+  };
+
   return (
-    <p>
-      {x}, {y}
-    </p>
+    <>
+      {isVisible && (
+        <p>
+          {x}, {y}
+        </p>
+      )}
+      <button onClick={toggleVisibility}>Click here</button>
+    </>
   );
 }
