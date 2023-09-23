@@ -5,7 +5,15 @@ export default function useTimer(initialTime = 0) {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setTimeLeft((prevTime) => prevTime - 1);
+      setTimeLeft((prevTime) => {
+        if (prevTime > 0) {
+          return prevTime - 1;
+        } else {
+          clearInterval(timer);
+
+          return prevTime;
+        }
+      });
     }, 1000);
 
     return () => clearInterval(timer);

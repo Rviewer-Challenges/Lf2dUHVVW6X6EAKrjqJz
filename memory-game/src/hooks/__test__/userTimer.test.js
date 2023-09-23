@@ -2,8 +2,13 @@ import { renderHook, act } from "@testing-library/react-hooks";
 import useTimer from "../useTimer.js";
 
 describe("useTimer", () => {
+
   beforeEach(() => {
     vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("should decrement timeLeft by 1 every second", () => {
@@ -42,10 +47,14 @@ describe("useTimer", () => {
       vi.advanceTimersByTime(3000);
     });
 
+    expect(result.current[0]).toBe(7);
+
     act(() => {
       const resetTimer = result.current[1];
       resetTimer();
     });
+
+    expect(result.current[0]).toBe(10);
 
     act(() => {
       vi.advanceTimersByTime(2000);
@@ -54,13 +63,13 @@ describe("useTimer", () => {
     expect(result.current[0]).toBe(8);
   });
 
-  it("should not allow the timer to go below 0", () => {
-    const { result } = renderHook(() => useTimer(30)); // seconds
+  it("should not allow the timer to go below 0 when time is longer than the initial timer", () => {
+    const { result } = renderHook(() => useTimer(2));
 
     act(() => {
-      vi.advanceTimersByTime(31000); 
+      vi.advanceTimersByTime(3000);
     });
 
-    expect(result.current[0]).toBeGreaterThanOrEqual(0); 
+    expect(result.current[0]).toBe(0);
   });
 });
