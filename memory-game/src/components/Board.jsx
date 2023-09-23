@@ -2,14 +2,17 @@ import React, { useState, useEffect } from "react";
 import Card from "./Card";
 
 export default function Board({ rows, cols, resetTimer }) {
-  const [board, setBoard] = useState(createBoard(rows, cols));
+  const [board, setBoard] = useState([]);
   const [flippedCards, setFlippedCards] = useState([]);
   const [matchedCards, setMatchedCards] = useState([]);
   const [moves, setMoves] = useState(0);
 
   useEffect(() => {
-    if (matchedCards.length === rows * cols) {
-      resetTimer();
+    setBoard(createBoard(rows, cols));
+  }, [rows, cols]);
+
+  useEffect(() => {
+    if (matchedCards.length === (rows * cols) / 2) {
     }
   }, [matchedCards, resetTimer, rows, cols]);
 
@@ -27,12 +30,14 @@ export default function Board({ rows, cols, resetTimer }) {
       }
 
       setTimeout(() => {
-        const newBoard = [...board];
-        flippedCards.forEach(({ rowIndex, colIndex }) => {
-          newBoard[rowIndex][colIndex].isFlipped = false;
+        setBoard((prevBoard) => {
+          const newBoard = [...prevBoard];
+          flippedCards.forEach(({ rowIndex, colIndex }) => {
+            newBoard[rowIndex][colIndex].isFlipped = false;
+          });
+          return newBoard;
         });
 
-        setBoard(newBoard);
         setFlippedCards([]);
       }, 1000);
     }
@@ -40,12 +45,16 @@ export default function Board({ rows, cols, resetTimer }) {
 
   function createBoard(rows, cols) {
     const totalCards = rows * cols;
-    const pairs = totalCards / 2;
-    const cardData = Array.from({ length: pairs }, (_, i) => i).flatMap((i) => [
-      i,
-      i,
-    ]);
-    const shuffledCards = cardData.sort(() => Math.random() - 0.5);
+
+    const cardData = [];
+
+    for (let i = 0; i < totalCards / 2; i++) {
+      for (let j = 0; j < 2; j++) {
+        cardData.push([i + "-" + j]);
+      }
+    }
+
+    const shuffledCards = [...cardData];
 
     const board = Array.from({ length: rows }, (_, rowIndex) =>
       Array.from({ length: cols }, (_, colIndex) => {
@@ -59,9 +68,11 @@ export default function Board({ rows, cols, resetTimer }) {
 
   function handleCardClick(clickedCard, rowIndex, colIndex) {
     if (flippedCards.length < 2 && !clickedCard.isFlipped) {
-      const newBoard = [...board];
-      newBoard[rowIndex][colIndex].isFlipped = true;
-      setBoard(newBoard);
+      setBoard((prevBoard) => {
+        const newBoard = [...prevBoard];
+        newBoard[rowIndex][colIndex].isFlipped = true;
+        return newBoard;
+      });
 
       setFlippedCards((prevFlipped) => [
         ...prevFlipped,
@@ -82,9 +93,11 @@ export default function Board({ rows, cols, resetTimer }) {
             card={card}
             isMatched={matchedCards.includes(card.id)}
             onClick={() => handleCardClick(card, rowIndex, colIndex)}
+            cardIndex={colIndex + rowIndex * cols}
           />
         ))
       )}
+
       <div>Moves: {moves}</div>
     </div>
   );

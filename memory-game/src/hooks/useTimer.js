@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-export default function useTimer(initialTime = 0) {
+export default function useTimer(initialTime = 0, onTimeout) {
   const [timeLeft, setTimeLeft] = useState(initialTime);
 
   useEffect(() => {
@@ -11,13 +11,18 @@ export default function useTimer(initialTime = 0) {
         } else {
           clearInterval(timer);
 
-          return prevTime;
+          if (onTimeout) {
+            console.log("onTimeout called");
+            onTimeout();
+          }
+
+          return 0;
         }
       });
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [initialTime, onTimeout]);
 
   function resetTimer() {
     setTimeLeft(initialTime);
