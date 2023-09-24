@@ -1,23 +1,23 @@
 import React from "react";
 
-export default function Card({ card, cardIndex, onClick, isMatched }) {
-  if (isMatched === null) isMatched = false;
+export default function Card({ card, onClick }) {
   const handleClick = () => {
-    if (!isMatched) {
+    if (!card.isFlipped && !card.isMatched) {
       onClick();
     }
   };
 
+  const displayId = card.id.split("-")[0];
 
   return (
     <div
-      className={`card ${card.isFlipped || isMatched ? "flipped" : ""}`}
+      className={`card ${card.isFlipped || card.isMatched ? "flipped" : ""}`}
       onClick={handleClick}
-      data-matched={isMatched}
-      data-flipped={card.isFlipped}
+      data-matched={card.isMatched ? "true" : "false"}
+      data-flipped={card.isFlipped ? "true" : "false"}
       data-testid={`card-${card.id}`}
     >
-      {card.isFlipped || isMatched ? card.id : ""}
+      {card.isFlipped || card.isMatched ? displayId : ""}
     </div>
   );
 }

@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 export default function useTimer(initialTime = 0, onTimeout) {
   const [timeLeft, setTimeLeft] = useState(initialTime);
   const [isActive, setIsActive] = useState(false);
 
   useEffect(() => {
-    console.log("useEffect is running, isActive:", isActive);  
     let timer;
     if (isActive) {
       timer = setInterval(() => {
@@ -14,34 +13,30 @@ export default function useTimer(initialTime = 0, onTimeout) {
             return prevTime - 1;
           } else {
             clearInterval(timer);
-
             if (onTimeout) {
               setIsActive(false);
               onTimeout();
             }
-
             return 0;
           }
         });
       }, 1000);
-
       return () => clearInterval(timer);
     }
-  }, [initialTime, onTimeout, isActive]);
+  }, [onTimeout, isActive]);
 
-  function resetTimer() {
+  const resetTimer = useCallback(() => {
     setTimeLeft(initialTime);
     setIsActive(false);
-  }
+  }, [initialTime]);
 
-  function stopTimer() {
+  const stopTimer = useCallback(() => {
     setIsActive(false);
-  }
+  }, []);
 
-  function startTimer() {
+  const startTimer = useCallback(() => {
     setIsActive(true);
-  }
-
+  }, []);
 
   return [timeLeft, resetTimer, startTimer, stopTimer, isActive];
 }

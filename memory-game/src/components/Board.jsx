@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Card from "./Card";
 
-export default function Board({ rows, cols, resetTimer }) {
-
+export default function Board({ rows, cols, resetTimer,  }) {
   if (rows <= 0 || cols <= 0) {
     throw new Error(
       "A negative or zero board size? That's possible only in the multiverse!"
@@ -13,6 +12,9 @@ export default function Board({ rows, cols, resetTimer }) {
   const [flippedCards, setFlippedCards] = useState([]);
   const [matchedCards, setMatchedCards] = useState([]);
   const [moves, setMoves] = useState(0);
+  const [matchedPairs, setMatchedPairs] = useState(0);
+  const totalPairs = (rows * cols) / 2;
+
   const getMatchId = (id) => id.split("-")[0];
 
   useEffect(() => {
@@ -21,6 +23,7 @@ export default function Board({ rows, cols, resetTimer }) {
 
   useEffect(() => {
     if (matchedCards.length === rows * cols) {
+      // Game over logic here
     }
   }, [matchedCards, resetTimer, rows, cols]);
 
@@ -29,31 +32,34 @@ export default function Board({ rows, cols, resetTimer }) {
       setMoves((prevMoves) => prevMoves + 1);
       const [firstCard, secondCard] = flippedCards;
 
-      if (firstCard.id !== secondCard.id && getMatchId(firstCard.id) === getMatchId(secondCard.id)) {
-        setMatchedCards((prevMatched) => [
-          ...prevMatched,
-          getMatchId(firstCard.id),
-          getMatchId(secondCard.id),
-        ]);
-      }
-
-      setTimeout(() => {
+      if (getMatchId(firstCard.id) !== getMatchId(secondCard.id)) {
+        // Cards don't match, so flip them back after a delay
+        setTimeout(() => {
+          setBoard((prevBoard) => {
+            const newBoard = [...prevBoard];
+            flippedCards.forEach(({ rowIndex, colIndex }) => {
+              newBoard[rowIndex][colIndex].isFlipped = false;
+            });
+            setFlippedCards([]); // Clear flipped cards
+            return newBoard;
+          });
+        }, 1000);
+      } else {
+        // Cards match, mark them as matched in setBoard
         setBoard((prevBoard) => {
           const newBoard = [...prevBoard];
           flippedCards.forEach(({ rowIndex, colIndex }) => {
-            newBoard[rowIndex][colIndex].isFlipped = false;
+            newBoard[rowIndex][colIndex].isMatched = true;
           });
+          setFlippedCards([]); // Clear flipped cards
           return newBoard;
         });
-
-        setFlippedCards([]);
-      }, 1000);
+      }
     }
   }, [flippedCards]);
 
   function createBoard(rows, cols) {
     const totalCards = rows * cols;
-
     const cardData = [];
 
     for (let i = 0; i < totalCards / 2; i++) {
@@ -84,7 +90,11 @@ export default function Board({ rows, cols, resetTimer }) {
   }
 
   function handleCardClick(clickedCard, rowIndex, colIndex) {
-    if (flippedCards.length < 2 && !clickedCard.isFlipped) {
+    if (
+      flippedCards.length < 2 &&
+      !clickedCard.isFlipped &&
+      !clickedCard.isMatched
+    ) {
       setBoard((prevBoard) => {
         const newBoard = [...prevBoard];
         newBoard[rowIndex][colIndex].isFlipped = true;
@@ -95,6 +105,44 @@ export default function Board({ rows, cols, resetTimer }) {
         ...prevFlipped,
         { ...clickedCard, rowIndex, colIndex },
       ]);
+
+      // Verifica si las dos cartas coinciden
+      if (flippedCards.length === 1) {
+        const [firstCard] = flippedCards;
+        if (getMatchId(firstCard.id) === getMatchId(clickedCard.id)) {
+          // Cartas coinciden, marca como emparejadas
+          setMatchedPairs((prevPairs) => prevPairs + 1);
+          setBoard((prevBoard) => {
+            const newBoard = [...prevBoard];
+            newBoard[rowIndex][colIndex].isMatched = true;
+            newBoard[firstCard.rowIndex][firstCard.colIndex].isMatched = true;
+            return newBoard;
+          });
+
+          // Verifica si todas las parejas se han emparejado
+          if (matchedPairs + 1 === totalPairs) {
+            // Detén el temporizador
+            stopTimer();
+            const remainingTime = timeLeft;
+            alert(
+              `¡Enhorabuena! Has completado el juego y te han sobrado ${remainingTime} segundos.`
+            );
+          }
+        } else {
+          // Cartas no coinciden, voltea de nuevo después de un tiempo
+          setTimeout(() => {
+            setBoard((prevBoard) => {
+              const newBoard = [...prevBoard];
+              newBoard[rowIndex][colIndex].isFlipped = false;
+              newBoard[firstCard.rowIndex][
+                firstCard.colIndex
+              ].isFlipped = false;
+              return newBoard;
+            });
+            setFlippedCards([]);
+          }, 1000);
+        }
+      }
     }
   }
 
@@ -116,6 +164,8 @@ export default function Board({ rows, cols, resetTimer }) {
       )}
 
       <div>Moves: {moves}</div>
+      <div>Matched Pairs: {matchedPairs}</div>
+      <div>Remaining Pairs: {totalPairs - matchedPairs}</div>
     </div>
   );
 }

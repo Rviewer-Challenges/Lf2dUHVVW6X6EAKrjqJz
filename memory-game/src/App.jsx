@@ -1,11 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Board from "./components/Board";
 import useTimer from "./hooks/useTimer";
+import ErrorBoundary from "./errors/ErrorBoundary";
 import "./styles.css";
 
 function App() {
   const [difficulty, setDifficulty] = useState(null);
-  const [timeLeft, resetTimer] = useTimer(60);
+
+  const onTimeout = useCallback(() => {
+    setDifficulty(null);
+    alert("¡Campana y se acabó!");
+  }, []);
+
+  const [timeLeft, resetTimer, startTimer] = useTimer(60, onTimeout);
+
+  useEffect(() => {
+    if (difficulty) {
+      console.log("Difficulty changed:", difficulty);
+      resetTimer();
+      startTimer();
+    }
+  }, [difficulty, resetTimer, startTimer]);
 
   return (
     <div className="App">
@@ -17,13 +32,11 @@ function App() {
         </div>
       ) : (
         <div>
-          <ErrorBoundary>
-            <Board
-              rows={difficulty[0]}
-              cols={difficulty[1]}
-              resetTimer={resetTimer}
-            />
-          </ErrorBoundary>
+          <Board
+            rows={difficulty[0]}
+            cols={difficulty[1]}
+            resetTimer={resetTimer}
+          />
           <div>Time Left: {timeLeft} seconds</div>
           <button onClick={() => setDifficulty(null)}>Change Difficulty</button>
         </div>

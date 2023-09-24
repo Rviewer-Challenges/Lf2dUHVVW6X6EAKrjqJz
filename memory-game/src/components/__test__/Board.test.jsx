@@ -11,12 +11,12 @@ import Board from "../Board";
 import { act } from "@testing-library/react";
 
 vi.mock("./Card", () => {
-  return function MockCard({ card, cardIndex, isMatched, onClick }) {
-    const matchedValue = isMatched ? "true" : "false";
+  return function MockCard({ card, cardIndex, onClick }) {
+    const matchedValue = card.isMatched ? "true" : "false";
 
     return (
       <div
-        data-testid={`card-${card.id}-${cardIndex}`}
+        data-testid={`card-${card.id}`}
         data-matched={matchedValue}
         onClick={onClick}
       >
@@ -32,14 +32,15 @@ describe("Board Component", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.spyOn(console, "error");
-    console.error.mockImplementation(() => {});
+    // vi.spyOn(console, "error");
+    // console.error.mockImplementation(() => {});
+    
     vi.useFakeTimers();
   });
 
   afterEach(() => {
     vi.useRealTimers();
-    console.error.mockRestore();
+    // console.error.mockRestore();
   });
 
   test("Should not accept negative numbers or zero", () => {
@@ -145,4 +146,68 @@ describe("Board Component", () => {
       { timeout: 2000 }
     );
   });
+
+  test("cards flip back when two non-matching cards are clicked", () => {
+    render(<Board rows={rows} cols={cols} />);
+    const card1 = screen.getByTestId("card-0-0");
+    const card2 = screen.getByTestId("card-1-0");
+
+    // Click two non-matching cards
+    act(() => {
+      fireEvent.click(card1);
+      fireEvent.click(card2);
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+
+    expect(screen.getByTestId("card-0-0").getAttribute("data-flipped")).toBe(
+      "false"
+    );
+    expect(screen.getByTestId("card-1-0").getAttribute("data-flipped")).toBe(
+      "false"
+    );
+  });
+
+  test("cards flip back and forth when two sets of non-matching cards are clicked", () => {
+    render(<Board rows={rows} cols={cols} />);
+    const card1 = screen.getByTestId("card-0-0");
+    const card2 = screen.getByTestId("card-1-0");
+    const card3 = screen.getByTestId("card-0-1");
+    const card4 = screen.getByTestId("card-1-1");
+  
+    act(() => {
+      fireEvent.click(card1);
+      fireEvent.click(card2);
+    });
+  
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+  
+    expect(screen.getByTestId("card-0-0").getAttribute("data-flipped")).toBe(
+      "false"
+    );
+    expect(screen.getByTestId("card-1-0").getAttribute("data-flipped")).toBe(
+      "false"
+    );
+  
+    act(() => {
+      fireEvent.click(card3);
+      fireEvent.click(card4);
+    });
+  
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+  
+    expect(screen.getByTestId("card-0-1").getAttribute("data-flipped")).toBe(
+      "false"
+    );
+    expect(screen.getByTestId("card-1-1").getAttribute("data-flipped")).toBe(
+      "false"
+    );
+  });
+  
 });
