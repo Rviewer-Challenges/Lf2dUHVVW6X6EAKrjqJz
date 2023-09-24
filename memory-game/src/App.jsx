@@ -17,11 +17,13 @@ function App() {
         </div>
       ) : (
         <div>
-          <Board
-            rows={difficulty[0]}
-            cols={difficulty[1]}
-            resetTimer={resetTimer}
-          />
+          <ErrorBoundary>
+            <Board
+              rows={difficulty[0]}
+              cols={difficulty[1]}
+              resetTimer={resetTimer}
+            />
+          </ErrorBoundary>
           <div>Time Left: {timeLeft} seconds</div>
           <button onClick={() => setDifficulty(null)}>Change Difficulty</button>
         </div>

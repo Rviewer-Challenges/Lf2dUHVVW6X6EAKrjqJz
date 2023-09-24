@@ -1,8 +1,14 @@
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  cleanup,
+} from "@testing-library/react";
 import "@testing-library/jest-dom";
 import Board from "../Board";
-import { renderHook, act } from "@testing-library/react-hooks";
+import { act } from "@testing-library/react";
 
 vi.mock("./Card", () => {
   return function MockCard({ card, cardIndex, isMatched, onClick }) {
@@ -26,32 +32,27 @@ describe("Board Component", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(console, "error");
+    console.error.mockImplementation(() => {});
     vi.useFakeTimers();
   });
 
   afterEach(() => {
     vi.useRealTimers();
+    console.error.mockRestore();
   });
 
   test("Should not accept negative numbers or zero", () => {
-    const { result } = renderHook(() =>
-      Board({ rows: -1, cols: 4, resetTimer: vi.fn() })
-    );
-    expect(result.error).toEqual(expect.any(Error));
-    expect(result.error).toEqual(
-      new Error(
-        "A negative or zero board size? That's possible only in the multiverse!"
-      )
+    expect(() => {
+      render(<Board rows={-1} cols={4} resetTimer={vi.fn()} />);
+    }).toThrow(
+      "A negative or zero board size? That's possible only in the multiverse!"
     );
 
-    const { result: result2 } = renderHook(() =>
-      Board({ rows: 0, cols: 0, resetTimer: vi.fn() })
-    );
-    expect(result2.error).toEqual(expect.any(Error));
-    expect(result2.error).toEqual(
-      new Error(
-        "A negative or zero board size? That's possible only in the multiverse!"
-      )
+    expect(() => {
+      render(<Board rows={0} cols={0} resetTimer={vi.fn()} />);
+    }).toThrow(
+      "A negative or zero board size? That's possible only in the multiverse!"
     );
   });
 
@@ -62,26 +63,30 @@ describe("Board Component", () => {
   });
 
   test("should have a shuffled board", () => {
-    const rows = 4;
-    const cols = 4;
+    let totalSequenceCount = 0;
+    const numberOfRuns = 100;
 
-    render(<Board rows={rows} cols={cols} />);
+    for (let run = 0; run < numberOfRuns; run++) {
+      render(<Board rows={4} cols={4} />);
+      const cards = screen.getAllByTestId(/card-\d+/);
+      const cardIds = cards.map((card) => card.getAttribute("data-testid"));
+      let sequenceCount = 0;
 
-    const cards = screen.getAllByTestId(/card-\d+/);
-    const cardIds = cards.map((card) => card.getAttribute("data-testid"));
-
-    let sequenceCount = 0;
-
-    for (let i = 0; i < cardIds.length - 1; i++) {
-      const currId = parseInt(cardIds[i].split("-")[1]);
-      const nextId = parseInt(cardIds[i + 1].split("-")[1]);
-
-      if (currId + 1 === nextId || currId - 1 === nextId) {
-        sequenceCount++;
+      for (let i = 0; i < cardIds.length - 1; i++) {
+        const currId = parseInt(cardIds[i].split("-")[1]);
+        const nextId = parseInt(cardIds[i + 1].split("-")[1]);
+        if (currId === nextId) {
+          sequenceCount++;
+        }
       }
+
+      totalSequenceCount += sequenceCount;
+
+      cleanup();
     }
 
-    expect(sequenceCount).toBeLessThan(6);
+    const averageSequenceCount = totalSequenceCount / numberOfRuns;
+    expect(averageSequenceCount).toBeLessThan(8);
   });
 
   test("starts with all cards face down", () => {
@@ -96,7 +101,10 @@ describe("Board Component", () => {
   test("flips a card when clicked", () => {
     render(<Board rows={rows} cols={cols} />);
     const card = screen.getByTestId("card-2-0");
-    fireEvent.click(card);
+
+    act(() => {
+      fireEvent.click(card);
+    });
 
     expect(card.getAttribute("data-flipped")).toBe("true");
     expect(card.getAttribute("data-matched")).toBe("false");
@@ -107,8 +115,11 @@ describe("Board Component", () => {
     const moves = screen.getByText("Moves: 0");
     const card1 = screen.getByTestId("card-7-0");
     const card2 = screen.getByTestId("card-7-1");
-    fireEvent.click(card1);
-    fireEvent.click(card2);
+
+    act(() => {
+      fireEvent.click(card1);
+      fireEvent.click(card2);
+    });
 
     expect(moves.textContent).toBe("Moves: 1");
   });
@@ -118,10 +129,11 @@ describe("Board Component", () => {
 
     const cards = screen.getAllByTestId(/^card-1/);
 
-    fireEvent.click(cards[0]);
-    fireEvent.click(cards[1]);
-
-    vi.runAllTimers();
+    act(() => {
+      fireEvent.click(cards[0]);
+      fireEvent.click(cards[1]);
+      vi.runAllTimers();
+    });
 
     waitFor(
       () => {
