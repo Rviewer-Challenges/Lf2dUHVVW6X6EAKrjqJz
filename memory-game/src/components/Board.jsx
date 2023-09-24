@@ -13,13 +13,14 @@ export default function Board({ rows, cols, resetTimer }) {
   const [flippedCards, setFlippedCards] = useState([]);
   const [matchedCards, setMatchedCards] = useState([]);
   const [moves, setMoves] = useState(0);
+  const getMatchId = (id) => id.split("-")[0];
 
   useEffect(() => {
     setBoard(createBoard(rows, cols));
   }, [rows, cols]);
 
   useEffect(() => {
-    if (matchedCards.length === (rows * cols) / 2) {
+    if (matchedCards.length === rows * cols) {
     }
   }, [matchedCards, resetTimer, rows, cols]);
 
@@ -28,12 +29,12 @@ export default function Board({ rows, cols, resetTimer }) {
       setMoves((prevMoves) => prevMoves + 1);
       const [firstCard, secondCard] = flippedCards;
 
-      if (
-        firstCard.id === secondCard.id &&
-        (firstCard.rowIndex !== secondCard.rowIndex ||
-          firstCard.colIndex !== secondCard.colIndex)
-      ) {
-        setMatchedCards((prevMatched) => [...prevMatched, secondCard.id]);
+      if (firstCard.id !== secondCard.id && getMatchId(firstCard.id) === getMatchId(secondCard.id)) {
+        setMatchedCards((prevMatched) => [
+          ...prevMatched,
+          getMatchId(firstCard.id),
+          getMatchId(secondCard.id),
+        ]);
       }
 
       setTimeout(() => {
@@ -57,11 +58,20 @@ export default function Board({ rows, cols, resetTimer }) {
 
     for (let i = 0; i < totalCards / 2; i++) {
       for (let j = 0; j < 2; j++) {
-        cardData.push([i + "-" + j]);
+        cardData.push(i + "-" + j);
       }
     }
 
     const shuffledCards = [...cardData];
+
+    // Fisher-Yates algorithm to shuffle.
+    for (let i = shuffledCards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledCards[i], shuffledCards[j]] = [
+        shuffledCards[j],
+        shuffledCards[i],
+      ];
+    }
 
     const board = Array.from({ length: rows }, (_, rowIndex) =>
       Array.from({ length: cols }, (_, colIndex) => {
