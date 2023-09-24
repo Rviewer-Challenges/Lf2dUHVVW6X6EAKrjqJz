@@ -2,6 +2,13 @@ import React, { useState, useEffect } from "react";
 import Card from "./Card";
 
 export default function Board({ rows, cols, resetTimer }) {
+
+  if (rows <= 0 || cols <= 0) {
+    throw new Error(
+      "A negative or zero board size? That's possible only in the multiverse!"
+    );
+  }
+
   const [board, setBoard] = useState([]);
   const [flippedCards, setFlippedCards] = useState([]);
   const [matchedCards, setMatchedCards] = useState([]);

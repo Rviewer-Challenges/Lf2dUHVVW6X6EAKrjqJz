@@ -27,16 +27,37 @@ describe("Board Component", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+  });
 
-  });  
+  test("Should not accept negative numbers or zero", () => {
+    const { result } = renderHook(() =>
+      Board({ rows: -1, cols: 4, resetTimer: vi.fn() })
+    );
+    expect(result.error).toEqual(expect.any(Error));
+    expect(result.error).toEqual(
+      new Error(
+        "A negative or zero board size? That's possible only in the multiverse!"
+      )
+    );
 
-  it("renders the board with the correct number of cards", () => {
+    const { result: result2 } = renderHook(() =>
+      Board({ rows: 0, cols: 0, resetTimer: vi.fn() })
+    );
+    expect(result2.error).toEqual(expect.any(Error));
+    expect(result2.error).toEqual(
+      new Error(
+        "A negative or zero board size? That's possible only in the multiverse!"
+      )
+    );
+  });
+
+  test("renders the board with the correct number of cards", () => {
     render(<Board rows={rows} cols={cols} />);
     const cards = screen.getAllByTestId(/card-\d+/);
     expect(cards).toHaveLength(rows * cols);
   });
 
-  it("starts with all cards face down", () => {
+  test("starts with all cards face down", () => {
     render(<Board rows={rows} cols={cols} />);
 
     const cards = screen.getAllByTestId(/card-\d+-\d+/);
@@ -45,7 +66,7 @@ describe("Board Component", () => {
     });
   });
 
-  it("flips a card when clicked", () => {
+  test("flips a card when clicked", () => {
     render(<Board rows={rows} cols={cols} />);
     const card = screen.getByTestId("card-2-0");
     fireEvent.click(card);
@@ -54,7 +75,7 @@ describe("Board Component", () => {
     expect(card.getAttribute("data-matched")).toBe("false");
   });
 
-  it("tracks the number of moves", () => {
+  test("tracks the number of moves", () => {
     render(<Board rows={rows} cols={cols} />);
     const moves = screen.getByText("Moves: 0");
     const card1 = screen.getByTestId("card-7-0");
