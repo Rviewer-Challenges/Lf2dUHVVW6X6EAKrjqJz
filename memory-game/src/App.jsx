@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
-import Board from "./components/Board";
+import Game from "./components/Game";
 import useTimer from "./hooks/useTimer";
-import ErrorBoundary from "./errors/ErrorBoundary";
 import "./styles.css";
 
 function App() {
@@ -11,12 +10,17 @@ function App() {
     setDifficulty(null);
     alert("¡Campana y se acabó!");
   }, []);
+  const [timeLeft, resetTimer, startTimer, stopTimer] = useTimer(60, onTimeout);
 
-  const [timeLeft, resetTimer, startTimer] = useTimer(60, onTimeout);
+  const onVictory = useCallback(() => {
+    stopTimer();
+    setTimeout(() => {
+      alert("¡Enhorabuena, has emparejado todas las parejas!");
+    }, 0);
+  }, [stopTimer]);
 
   useEffect(() => {
     if (difficulty) {
-      console.log("Difficulty changed:", difficulty);
       resetTimer();
       startTimer();
     }
@@ -32,12 +36,12 @@ function App() {
         </div>
       ) : (
         <div>
-          <Board
+          <Game
             rows={difficulty[0]}
             cols={difficulty[1]}
-            resetTimer={resetTimer}
+            timer={{ timeLeft, resetTimer, startTimer, stopTimer }}
+            onVictory={onVictory}
           />
-          <div>Time Left: {timeLeft} seconds</div>
           <button onClick={() => setDifficulty(null)}>Change Difficulty</button>
         </div>
       )}

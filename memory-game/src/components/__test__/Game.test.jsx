@@ -7,6 +7,7 @@ import {
   cleanup,
 } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import Game from "../Game";
 import Board from "../Board";
 import { act } from "@testing-library/react";
 
@@ -26,21 +27,36 @@ vi.mock("./Card", () => {
   };
 });
 
+const mockTimer = {
+  timeLeft: 60,
+  resetTimer: vi.fn(),
+  startTimer: vi.fn(),
+  stopTimer: vi.fn(),
+  isActive: false,
+};
+
 describe("Board Component", () => {
   const rows = 4;
   const cols = 4;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // vi.spyOn(console, "error");
-    // console.error.mockImplementation(() => {});
-    
+    vi.spyOn(console, "error");
+    console.error.mockImplementation(() => {});
     vi.useFakeTimers();
   });
 
   afterEach(() => {
     vi.useRealTimers();
-    // console.error.mockRestore();
+    console.error.mockRestore();
+  });
+
+  test("renders the board with the correct number of cards", () => {
+    render(
+      <Game rows={rows} cols={cols} timer={mockTimer} onVictory={vi.fn()} />
+    );
+    const cards = screen.getAllByTestId(/card-\d+/);
+    expect(cards).toHaveLength(rows * cols);
   });
 
   test("Should not accept negative numbers or zero", () => {
@@ -176,32 +192,32 @@ describe("Board Component", () => {
     const card2 = screen.getByTestId("card-1-0");
     const card3 = screen.getByTestId("card-0-1");
     const card4 = screen.getByTestId("card-1-1");
-  
+
     act(() => {
       fireEvent.click(card1);
       fireEvent.click(card2);
     });
-  
+
     act(() => {
       vi.advanceTimersByTime(1000);
     });
-  
+
     expect(screen.getByTestId("card-0-0").getAttribute("data-flipped")).toBe(
       "false"
     );
     expect(screen.getByTestId("card-1-0").getAttribute("data-flipped")).toBe(
       "false"
     );
-  
+
     act(() => {
       fireEvent.click(card3);
       fireEvent.click(card4);
     });
-  
+
     act(() => {
       vi.advanceTimersByTime(1000);
     });
-  
+
     expect(screen.getByTestId("card-0-1").getAttribute("data-flipped")).toBe(
       "false"
     );
@@ -209,5 +225,4 @@ describe("Board Component", () => {
       "false"
     );
   });
-  
 });
