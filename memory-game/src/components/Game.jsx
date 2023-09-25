@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Board from "./Board";
 import GameStats from "./GameStats";
 
@@ -9,14 +9,20 @@ export default function Game({ rows, cols, timer, onVictory }) {
     );
   }
 
-  const { timeLeft, resetTimer, startTimer, stopTimer, isActive } = timer;
+  const isBoardDisabledRef = useRef(false);
 
+  const { timeLeft, resetTimer, startTimer, stopTimer, isActive } = timer;
+  const [isBoardDisabled, setIsBoardDisabled] = useState(false);
   const [board, setBoard] = useState([]);
   const [flippedCards, setFlippedCards] = useState([]);
   const [matchedCards, setMatchedCards] = useState([]);
   const [moves, setMoves] = useState(0);
   const [matchedPairs, setMatchedPairs] = useState(0);
   const totalPairs = (rows * cols) / 2;
+
+  useEffect(() => {
+    isBoardDisabledRef.current = isBoardDisabled;
+  }, [isBoardDisabled]);
 
   useEffect(() => {
     setBoard(createBoard(rows, cols));
@@ -30,42 +36,37 @@ export default function Game({ rows, cols, timer, onVictory }) {
 
   useEffect(() => {
     if (flippedCards.length === 2) {
+      setIsBoardDisabled(true); // Desactivar clics en el tablero
       setMoves((prevMoves) => prevMoves + 1);
       const [firstCard, secondCard] = flippedCards;
 
       if (getMatchId(firstCard.id) !== getMatchId(secondCard.id)) {
-        // Cards don't match, so flip them back after a delay
+        // Las tarjetas no coinciden
         setTimeout(() => {
           setBoard((prevBoard) => {
             const newBoard = [...prevBoard];
             flippedCards.forEach(({ rowIndex, colIndex }) => {
               newBoard[rowIndex][colIndex].isFlipped = false;
             });
-            setFlippedCards([]); // Clear flipped cards
             return newBoard;
           });
+          setFlippedCards([]); // Limpiar tarjetas volteadas
+          setIsBoardDisabled(false); // Re-activar clics en el tablero
         }, 1000);
       } else {
-        // Cards match, mark them as matched in setBoard
+        // Las tarjetas coinciden
         setBoard((prevBoard) => {
           const newBoard = [...prevBoard];
           flippedCards.forEach(({ rowIndex, colIndex }) => {
             newBoard[rowIndex][colIndex].isMatched = true;
           });
-          setFlippedCards([]); // Clear flipped cards
           return newBoard;
         });
-        setMatchedPairs((prevPairs) => prevPairs + 1);
-        if (matchedPairs + 1 === totalPairs) {
-          stopTimer();
-          const remainingTime = timeLeft;
-          alert(
-            `¡Enhorabuena! Has completado el juego y te han sobrado ${remainingTime} segundos.`
-          );
-        }
+        setFlippedCards([]); // Limpiar tarjetas volteadas
+        setIsBoardDisabled(false); // Re-activar clics en el tablero
       }
     }
-  }, [flippedCards, matchedPairs, stopTimer, timeLeft, totalPairs]);
+  }, [flippedCards]);
 
   function createBoard(rows, cols) {
     const totalCards = rows * cols;
@@ -99,21 +100,22 @@ export default function Game({ rows, cols, timer, onVictory }) {
   }
 
   function handleCardClick(clickedCard, rowIndex, colIndex) {
+    if (isBoardDisabledRef.current) return;
+    // If the card is already flipped or matched, don't flip it
     if (
       flippedCards.length < 2 &&
       !clickedCard.isFlipped &&
       !clickedCard.isMatched
     ) {
+      setFlippedCards((prevFlipped) => [
+        ...prevFlipped,
+        { ...clickedCard, rowIndex, colIndex },
+      ]);
       setBoard((prevBoard) => {
         const newBoard = [...prevBoard];
         newBoard[rowIndex][colIndex].isFlipped = true;
         return newBoard;
       });
-
-      setFlippedCards((prevFlipped) => [
-        ...prevFlipped,
-        { ...clickedCard, rowIndex, colIndex },
-      ]);
     }
   }
 
@@ -123,7 +125,12 @@ export default function Game({ rows, cols, timer, onVictory }) {
 
   return (
     <>
-      <Board board={board} handleCardClick={handleCardClick} />
+      <Board
+        board={board}
+        handleCardClick={handleCardClick}
+        isBoardDisabled={isBoardDisabled}
+        flippedCards={flippedCards}
+      />
       <GameStats
         timeLeft={timeLeft}
         moves={moves}

@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function Card({ card, onClick }) {
+export default function Card({ card, onClick, isFlipping }) {
   const handleClick = () => {
     if (!card.isFlipped && !card.isMatched) {
       onClick();
@@ -11,7 +11,9 @@ export default function Card({ card, onClick }) {
 
   return (
     <div
-      className={`card ${card.isFlipped || card.isMatched ? "flipped" : ""}`}
+      className={`card ${card.isFlipped || card.isMatched ? "flipped" : ""} ${
+        isFlipping ? "flipping" : ""
+      }`}
       onClick={handleClick}
       data-matched={card.isMatched ? "true" : "false"}
       data-flipped={card.isFlipped ? "true" : "false"}

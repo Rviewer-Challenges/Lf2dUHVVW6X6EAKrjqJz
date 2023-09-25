@@ -18,7 +18,7 @@ describe("Board", () => {
   const handleCardClick = vi.fn();
 
   test("renders the board with the correct number of rows and columns", () => {
-    const { getByTestId } = render(<Board board={board} />);
+    const { getByTestId } = render(<Board board={board} flippedCards={[]} />);
     const boardElement = getByTestId("board");
 
     expect(boardElement.children.length).toBe(4);
@@ -34,7 +34,11 @@ describe("Board", () => {
 
   test("calls the handleCardClick function when a card is clicked", () => {
     const { getByTestId } = render(
-      <Board board={board} handleCardClick={handleCardClick} />
+      <Board
+        board={board}
+        handleCardClick={handleCardClick}
+        flippedCards={[]}
+      />
     );
     const cardElement = getByTestId("card-0-0");
     fireEvent.click(cardElement);

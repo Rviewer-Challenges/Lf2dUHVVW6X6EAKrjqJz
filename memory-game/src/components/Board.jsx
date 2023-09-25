@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import Card from "./Card";
 
-export default function Board({ board, handleCardClick }) {
+export default function Board({ board, handleCardClick, flippedCards }) {
   useEffect(() => {}, [board]);
 
   if (!board || board.length === 0) {
@@ -10,7 +10,7 @@ export default function Board({ board, handleCardClick }) {
 
   const rows = board.length;
   const cols = board[0].length;
- 
+
   return (
     <div
       className="board"
@@ -23,6 +23,7 @@ export default function Board({ board, handleCardClick }) {
             key={`${rowIndex}-${colIndex}`}
             card={card}
             onClick={() => handleCardClick(card, rowIndex, colIndex)}
+            isFlipping={flippedCards.some((fc) => fc.id === card.id)}
           />
         ))
       )}

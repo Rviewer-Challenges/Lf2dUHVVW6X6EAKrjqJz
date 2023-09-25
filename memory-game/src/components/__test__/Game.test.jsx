@@ -44,9 +44,7 @@ describe("Board Component", () => {
 
   test("Should not accept negative numbers or zero", () => {
     expect(() => {
-      render(
-      
-      <Game rows={-1} cols={4} timer={mockTimer} onVictory={vi.fn()} />);
+      render(<Game rows={-1} cols={4} timer={mockTimer} onVictory={vi.fn()} />);
     }).toThrow(
       "A negative or zero board size? That's possible only in the multiverse!"
     );
@@ -142,7 +140,6 @@ describe("Board Component", () => {
       <Game rows={rows} cols={cols} timer={mockTimer} onVictory={vi.fn()} />
     );
 
-
     const cards = screen.getAllByTestId(/^card-1/);
 
     act(() => {
@@ -155,6 +152,48 @@ describe("Board Component", () => {
       () => {
         const matchedCards = screen
           .getAllByTestId(/^card-1/)
+          .filter((card) => card.getAttribute("data-matched") === "true");
+        expect(matchedCards.length).toBe(2);
+      },
+      { timeout: 2000 }
+    );
+  });
+
+  test("it should match pairs when two similar cards are clicked and allow continued play", () => {
+    render(
+      <Game rows={rows} cols={cols} timer={mockTimer} onVictory={vi.fn()} />
+    );
+
+    // Matching the first pair
+    const firstPair = screen.getAllByTestId(/^card-1/);
+    act(() => {
+      fireEvent.click(firstPair[0]);
+      fireEvent.click(firstPair[1]);
+      vi.runAllTimers();
+    });
+
+    waitFor(
+      () => {
+        const matchedCards = screen
+          .getAllByTestId(/^card-1/)
+          .filter((card) => card.getAttribute("data-matched") === "true");
+        expect(matchedCards.length).toBe(2);
+      },
+      { timeout: 2000 }
+    );
+
+    // Attempting to match a second pair
+    const secondPair = screen.getAllByTestId(/^card-2/);
+    act(() => {
+      fireEvent.click(secondPair[0]);
+      fireEvent.click(secondPair[1]);
+      vi.runAllTimers();
+    });
+
+    waitFor(
+      () => {
+        const matchedCards = screen
+          .getAllByTestId(/^card-2/)
           .filter((card) => card.getAttribute("data-matched") === "true");
         expect(matchedCards.length).toBe(2);
       },
@@ -227,6 +266,40 @@ describe("Board Component", () => {
       "false"
     );
     expect(screen.getByTestId("card-1-1").getAttribute("data-flipped")).toBe(
+      "false"
+    );
+  });
+
+  test("prevents user from clicking more than two non-matching cards within the same movement", () => {
+    render(
+      <Game rows={rows} cols={cols} timer={mockTimer} onVictory={vi.fn()} />
+    );
+
+    const card1 = screen.getByTestId("card-0-0");
+    const card2 = screen.getByTestId("card-1-0");
+    const card3 = screen.getByTestId("card-2-0");
+
+    act(() => {
+      fireEvent.click(card1);
+      fireEvent.click(card2);
+    });
+
+    expect(screen.getByTestId("card-0-0").getAttribute("data-flipped")).toBe(
+      "true"
+    );
+    expect(screen.getByTestId("card-1-0").getAttribute("data-flipped")).toBe(
+      "true"
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(950);
+    });
+
+    act(() => {
+      fireEvent.click(card3);
+    });
+
+    expect(screen.getByTestId("card-2-0").getAttribute("data-flipped")).toBe(
       "false"
     );
   });
