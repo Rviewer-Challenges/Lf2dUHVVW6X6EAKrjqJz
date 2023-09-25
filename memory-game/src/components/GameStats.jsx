@@ -8,10 +8,10 @@ export default function GameStats({
 }) {
   return (
     <div>
-      <div>Time Left: {timeLeft} seconds</div>
-      <div>Moves: {moves}</div>
-      <div>Matched Pairs: {matchedPairs}</div>
-      <div>Remaining Pairs: {totalPairs - matchedPairs}</div>
+      <div data-testid="timeLeft">Time Left: {timeLeft} seconds</div>
+      <div data-testid="moves">Moves: {moves}</div>
+      <div data-testid="matched">Matched Pairs: {matchedPairs}</div>
+      <div data-testid="remaining">Remaining Pairs: {totalPairs - matchedPairs}</div>
     </div>
   );
 }

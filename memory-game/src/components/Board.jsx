@@ -10,10 +10,11 @@ export default function Board({ board, handleCardClick }) {
 
   const rows = board.length;
   const cols = board[0].length;
-
+ 
   return (
     <div
       className="board"
+      data-testid="board"
       style={{ gridTemplateColumns: `repeat(${cols}, 100px)` }}
     >
       {board.map((row, rowIndex) =>

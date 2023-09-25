@@ -8,24 +8,7 @@ import {
 } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import Game from "../Game";
-import Board from "../Board";
 import { act } from "@testing-library/react";
-
-vi.mock("./Card", () => {
-  return function MockCard({ card, cardIndex, onClick }) {
-    const matchedValue = card.isMatched ? "true" : "false";
-
-    return (
-      <div
-        data-testid={`card-${card.id}`}
-        data-matched={matchedValue}
-        onClick={onClick}
-      >
-        Card
-      </div>
-    );
-  };
-});
 
 const mockTimer = {
   timeLeft: 60,

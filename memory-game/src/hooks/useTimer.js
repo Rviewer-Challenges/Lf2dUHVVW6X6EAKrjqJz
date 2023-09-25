@@ -8,35 +8,27 @@ export default function useTimer(initialTime = 0, onTimeout) {
     let timer;
     if (isActive) {
       timer = setInterval(() => {
-        setTimeLeft((prevTime) => {
-          if (prevTime > 0) {
-            return prevTime - 1;
-          } else {
-            clearInterval(timer);
-            if (onTimeout) {
-              setIsActive(false);
-              onTimeout();
-            }
-            return 0;
-          }
-        });
+        setTimeLeft((prevTime) => prevTime > 0 ? prevTime - 1 : 0);
       }, 1000);
-      return () => clearInterval(timer);
     }
-  }, [onTimeout, isActive]);
+    return () => clearInterval(timer);
+  }, [isActive]);
 
   const resetTimer = useCallback(() => {
     setTimeLeft(initialTime);
     setIsActive(false);
   }, [initialTime]);
 
-  const stopTimer = useCallback(() => {
-    setIsActive(false);
-  }, []);
+  const stopTimer = useCallback(() => setIsActive(false), []);
 
-  const startTimer = useCallback(() => {
-    setIsActive(true);
-  }, []);
+  const startTimer = useCallback(() => setIsActive(true), []);
+
+  useEffect(() => {
+    if (timeLeft === 0 && onTimeout) {
+      setIsActive(false);
+      onTimeout();
+    }
+  }, [timeLeft, onTimeout]);
 
   return [timeLeft, resetTimer, startTimer, stopTimer, isActive];
 }
