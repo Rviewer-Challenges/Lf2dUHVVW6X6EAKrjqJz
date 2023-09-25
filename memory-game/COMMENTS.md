@@ -9,3 +9,10 @@
 - **Testing:** I've written unit tests as well as some integration tests. I tried to use screen to really validate what the user would see for real when playing the game.
 
 - **Images: ** I know that the challenge asked for something that you are passionated about. However, I have decided to use open source images to not violate any copyright. There are only two images (for the timeout and the victory) that I used as a tribute to "1, 2, 3, Responda otra vez". My favourite TV show when I was a child.
+
+
+#Build
+
+**To run this game**, please execute: npm install --legacy-peer-deps (testing-library is not compatible with React 18).
+**To serve the application** from a local environment: npm run dev.
+**To run the test suite**, npm test.
