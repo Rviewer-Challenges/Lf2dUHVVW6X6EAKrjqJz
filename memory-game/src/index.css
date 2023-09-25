@@ -1,0 +1,206 @@
+.App {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10vw, 1fr));
+  gap: 1vw;
+  justify-content: center;
+  margin: auto;
+}
+
+.card {
+  width: 9vw;
+  height: 9vw;
+  border: 1px solid black;
+  text-align: center;
+  line-height: 10vw;
+  font-size: 2vw;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 1s;
+}
+
+.card.flipped {
+  background-color: lightgrey;
+}
+
+.card.matched {
+  background-color: green;
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.Moves {
+  margin-top: 20px;
+  font-size: 1.5em;
+}
+
+.card.flipping {
+  transform: rotateY(180deg);
+}
+
+.game-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.game-stats {
+  flex: 0.2; /* Ocupa el 20% del ancho */
+}
+
+.game-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.game-stats h2 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.game-stats p {
+  margin: 0;
+}
+
+.game-stats .button {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 0.25rem;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 1rem;
+  width: 100%;
+  max-width: 200px;
+}
+
+@media (min-width: 768px) {
+  .game-stats .button {
+    max-width: none;
+  }
+}
+
+.game-stats .button:hover {
+  background-color: #0062cc;
+}
+
+
+.game-board {
+  flex: 0.8; /* Ocupa el 80% del ancho */
+}
+
+.difficulty-selection-container {
+  display: flex;
+  justify-content: center;
+}
+
+.difficulty-selection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto;
+}
+
+.difficulty-button {
+  display: block;
+  margin: 10px auto;
+  padding: 10px 20px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.difficulty-button.easy {
+  background-color: green;
+}
+
+.difficulty-button.medium {
+  background-color: orange;
+}
+
+.difficulty-button.difficult {
+  background-color: red;
+}
+
+.game-board-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+
+.bell-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bell-message-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.bell-message {
+  font-size: 6rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.victory-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url(${victoryImage});
+  background-size: cover;
+  background-repeat: no-repeat;
+  z-index: 999;
+}
+
+.victory-message-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.victory-message {
+  font-size: 6rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
