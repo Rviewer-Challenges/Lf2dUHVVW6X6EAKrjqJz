@@ -15,7 +15,7 @@ export default function Board({ board, handleCardClick, flippedCards }) {
     <div
       className="board"
       data-testid="board"
-      style={{ gridTemplateColumns: `repeat(${cols}, 100px)` }}
+      style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}
     >
       {board.map((row, rowIndex) =>
         row.map((card, colIndex) => (

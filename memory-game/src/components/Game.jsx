@@ -2,7 +2,13 @@ import React, { useState, useEffect, useRef } from "react";
 import Board from "./Board";
 import GameStats from "./GameStats";
 
-export default function Game({ rows, cols, timer, onVictory }) {
+export default function Game({
+  rows,
+  cols,
+  timer,
+  onVictory,
+  onChangeDifficulty,
+}) {
   if (rows <= 0 || cols <= 0) {
     throw new Error(
       "A negative or zero board size? That's possible only in the multiverse!"
@@ -21,6 +27,12 @@ export default function Game({ rows, cols, timer, onVictory }) {
   const totalPairs = (rows * cols) / 2;
 
   useEffect(() => {
+    console.log(
+      "isBoardDisabled changed from ",
+      isBoardDisabledRef.current,
+      " to ",
+      isBoardDisabled
+    );
     isBoardDisabledRef.current = isBoardDisabled;
   }, [isBoardDisabled]);
 
@@ -39,6 +51,10 @@ export default function Game({ rows, cols, timer, onVictory }) {
       setIsBoardDisabled(true); // Desactivar clics en el tablero
       setMoves((prevMoves) => prevMoves + 1);
       const [firstCard, secondCard] = flippedCards;
+      console.log("firstCard", firstCard);
+      console.log("secondCard", secondCard);
+      console.log("getMatchId(firstCard.id)", getMatchId(firstCard.id));
+      console.log("getMatchId(secondCard.id)", getMatchId(secondCard.id));
 
       if (getMatchId(firstCard.id) !== getMatchId(secondCard.id)) {
         // Las tarjetas no coinciden
@@ -62,11 +78,13 @@ export default function Game({ rows, cols, timer, onVictory }) {
           });
           return newBoard;
         });
+        setMatchedCards([...matchedCards, firstCard, secondCard]); // Agregar cartas emparejadas
         setFlippedCards([]); // Limpiar tarjetas volteadas
         setIsBoardDisabled(false); // Re-activar clics en el tablero
+        setMatchedPairs(matchedPairs + 1); // Actualizar número de pares emparejados
       }
     }
-  }, [flippedCards]);
+  }, [flippedCards, matchedCards, matchedPairs]);
 
   function createBoard(rows, cols) {
     const totalCards = rows * cols;
@@ -78,6 +96,7 @@ export default function Game({ rows, cols, timer, onVictory }) {
       }
     }
 
+    console.log("cardData", cardData);
     const shuffledCards = [...cardData];
 
     // Fisher-Yates algorithm to shuffle.
@@ -88,6 +107,8 @@ export default function Game({ rows, cols, timer, onVictory }) {
         shuffledCards[i],
       ];
     }
+
+    console.log("shuffledCards", shuffledCards);
 
     const board = Array.from({ length: rows }, (_, rowIndex) =>
       Array.from({ length: cols }, (_, colIndex) => {
@@ -107,6 +128,7 @@ export default function Game({ rows, cols, timer, onVictory }) {
       !clickedCard.isFlipped &&
       !clickedCard.isMatched
     ) {
+      console.log(`Card clicked: ${clickedCard.name}`);
       setFlippedCards((prevFlipped) => [
         ...prevFlipped,
         { ...clickedCard, rowIndex, colIndex },
@@ -124,19 +146,24 @@ export default function Game({ rows, cols, timer, onVictory }) {
   }
 
   return (
-    <>
-      <Board
-        board={board}
-        handleCardClick={handleCardClick}
-        isBoardDisabled={isBoardDisabled}
-        flippedCards={flippedCards}
-      />
-      <GameStats
-        timeLeft={timeLeft}
-        moves={moves}
-        matchedPairs={matchedPairs}
-        totalPairs={totalPairs}
-      />
-    </>
+    <div className="game-container">
+      <div className="game-stats">
+        <GameStats
+          timeLeft={timeLeft}
+          moves={moves}
+          matchedPairs={matchedPairs}
+          totalPairs={totalPairs}
+          onChangeDifficulty={onChangeDifficulty}
+        />
+      </div>
+      <div className="game-board">
+        <Board
+          board={board}
+          handleCardClick={handleCardClick}
+          isBoardDisabled={isBoardDisabled}
+          flippedCards={flippedCards}
+        />
+      </div>
+    </div>
   );
 }

@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Game from "./components/Game";
 import useTimer from "./hooks/useTimer";
-import "./styles.css";
+import bellImage from "/images/tacañonas.jpg";
 
 function App() {
   const [difficulty, setDifficulty] = useState(null);
+  const [showBell, setShowBell] = useState(false);
 
   const onTimeout = useCallback(() => {
     setDifficulty(null);
-    alert("¡Campana y se acabó!");
+    setShowBell(true);
   }, []);
   const [timeLeft, resetTimer, startTimer, stopTimer] = useTimer(60, onTimeout);
 
@@ -29,20 +30,46 @@ function App() {
   return (
     <div className="App">
       {!difficulty ? (
-        <div>
-          <button onClick={() => setDifficulty([4, 4])}>Easy</button>
-          <button onClick={() => setDifficulty([4, 6])}>Medium</button>
-          <button onClick={() => setDifficulty([5, 6])}>Difficult</button>
+        <div className="difficulty-selection-container">
+          <div className="difficulty-selection">
+            <h2>Select level of difficulty</h2>
+            <button
+              className="difficulty-button easy"
+              onClick={() => setDifficulty([4, 4])}
+            >
+              Easy
+            </button>
+            <button
+              className="difficulty-button medium"
+              onClick={() => setDifficulty([4, 6])}
+            >
+              Medium
+            </button>
+            <button
+              className="difficulty-button difficult"
+              onClick={() => setDifficulty([5, 6])}
+            >
+              Difficult
+            </button>
+          </div>
         </div>
       ) : (
-        <div>
-          <Game
-            rows={difficulty[0]}
-            cols={difficulty[1]}
-            timer={{ timeLeft, resetTimer, startTimer, stopTimer }}
-            onVictory={onVictory}
-          />
-          <button onClick={() => setDifficulty(null)}>Change Difficulty</button>
+        <div className="game-container">
+          <div className="game-board">
+            {showBell && (
+              <div className="bell-overlay">
+                <img src={bellImage} alt="Campana" />
+                <div className="bell-message">¡Campana y se acabó!</div>
+              </div>
+            )}
+            <Game
+              rows={difficulty[0]}
+              cols={difficulty[1]}
+              timer={{ timeLeft, resetTimer, startTimer, stopTimer }}
+              onVictory={onVictory}
+              onChangeDifficulty={() => setDifficulty(null)}
+            />
+          </div>
         </div>
       )}
     </div>

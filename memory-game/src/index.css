@@ -1,69 +1,143 @@
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
+.App {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+.board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10vw, 1fr));
+  gap: 1vw;
+  justify-content: center;
+  margin: auto;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+.card {
+  width: 9vw;
+  height: 9vw;
+  border: 1px solid black;
+  text-align: center;
+  line-height: 10vw;
+  font-size: 2vw;
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  transition: background-color 0.3s ease, transform 1s;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+.card.flipped {
+  background-color: lightgrey;
+}
+
+.card.matched {
+  background-color: green;
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.Moves {
+  margin-top: 20px;
+  font-size: 1.5em;
+}
+
+.card.flipping {
+  transform: rotateY(180deg);
+}
+
+.game-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.game-stats {
+  flex: 0.2; /* Ocupa el 20% del ancho */
+}
+
+.game-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.game-stats h2 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.game-stats p {
+  margin: 0;
+}
+
+.game-stats .button {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 0.25rem;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 1rem;
+  width: 100%;
+  max-width: 200px;
+}
+
+@media (min-width: 768px) {
+  .game-stats .button {
+    max-width: none;
   }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+}
+
+.game-stats .button:hover {
+  background-color: #0062cc;
+}
+
+
+.game-board {
+  flex: 0.8; /* Ocupa el 80% del ancho */
+}
+
+.difficulty-selection-container {
+  display: flex;
+  justify-content: center;
+}
+
+.difficulty-selection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto;
+}
+
+.difficulty-button {
+  display: block;
+  margin: 10px auto;
+  padding: 10px 20px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.difficulty-button.easy {
+  background-color: green;
+}
+
+.difficulty-button.medium {
+  background-color: orange;
+}
+
+.difficulty-button.difficult {
+  background-color: red;
 }

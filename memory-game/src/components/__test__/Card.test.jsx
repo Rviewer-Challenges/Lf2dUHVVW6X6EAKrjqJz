@@ -10,7 +10,7 @@ describe("Card", () => {
     mockOnClick = vi.fn();
   });
 
-  it("should render correctly", () => {
+  test("render correctly", () => {
     render(
       <Card
         card={{ id: "1-0", isFlipped: false, isMatched: false }}
@@ -21,42 +21,46 @@ describe("Card", () => {
     expect(screen.getByTestId("card-1-0")).toHaveClass("card"); // Actualizar el data-testid
   });
 
-  it("should display card id when isFlipped is true", () => {
+  test("display card image (not the back part) when isFlipped is true", () => {
     render(
       <Card
         card={{ id: "0-0", isFlipped: true, isMatched: false }}
-        cardIndex={0}
         onClick={mockOnClick}
       />
     );
 
-    expect(screen.getByTestId("card-0-0")).toBeInTheDocument();
+    const cardImage = screen.getByAltText("Card");
+    expect(cardImage).toBeInTheDocument();
+    expect(cardImage).not.toHaveClass("card-back");
   });
 
-  it("should display card id when isMatched is true", () => {
+  test("display card image (not the back part) when isMatched is true", () => {
     render(
       <Card
-        card={{ id: "0-0", isFlipped: false, isMatched: true }}
-        cardIndex={0}
+        card={{ id: "0-0", isFlipped: true, isMatched: false }}
         onClick={mockOnClick}
       />
     );
 
-    expect(screen.getByTestId("card-0-0")).toHaveTextContent("0");
+    const cardImage = screen.getByAltText("Card");
+    expect(cardImage).toBeInTheDocument();
+    expect(cardImage).toHaveClass("card-image");
+    expect(cardImage).not.toHaveClass("card-back");
   });
-it("should trigger onClick when card is clicked", () => {
-  render(
-    <Card
-      card={{ id: "0-0", isFlipped: false, isMatched: false }}
-      cardIndex={0}
-      onClick={mockOnClick}
-    />
-  );
-  fireEvent.click(screen.getByTestId("card-0-0"));
-  expect(mockOnClick).toHaveBeenCalled();
-});
 
-  it("should not trigger onClick when card is clicked if already matched", () => {
+  test("trigger onClick when card is clicked", () => {
+    render(
+      <Card
+        card={{ id: "0-0", isFlipped: false, isMatched: false }}
+        cardIndex={0}
+        onClick={mockOnClick}
+      />
+    );
+    fireEvent.click(screen.getByTestId("card-0-0"));
+    expect(mockOnClick).toHaveBeenCalled();
+  });
+
+  test("not trigger onClick when card is clicked if already matched", () => {
     render(
       <Card
         card={{ id: "1-0", isFlipped: false, isMatched: true }}
@@ -70,18 +74,20 @@ it("should trigger onClick when card is clicked", () => {
     expect(mockOnClick).not.toHaveBeenCalled();
   });
 
-  it("should not display card id when neither isFlipped nor isMatched is true", () => {
+  test("card is rendered facing down for the first time", () => {
     render(
       <Card
         card={{ id: "0-0", isFlipped: false, isMatched: false }}
-        cardIndex={0}
         onClick={mockOnClick}
       />
     );
-    expect(screen.queryByText("0-0")).not.toBeInTheDocument();
+
+    const cardImage = screen.getByTestId("card-0-0");
+    expect(cardImage).toBeInTheDocument();
+    expect(cardImage).toHaveClass("card card-back");
   });
 
-  it("should have 'flipped' class when isFlipped is true", () => {
+  test("have 'flipped' class when isFlipped is true", () => {
     render(
       <Card
         card={{ id: "1-1", isFlipped: true, isMatched: false }}
