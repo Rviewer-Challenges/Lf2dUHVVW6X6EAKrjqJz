@@ -3,15 +3,23 @@ import Game from "./components/Game";
 import useTimer from "./hooks/useTimer";
 import bellImage from "/images/tacañonas.jpg";
 
-function App() {
+export default function App() {
   const [difficulty, setDifficulty] = useState(null);
   const [showBell, setShowBell] = useState(false);
+  const [showGameOver, setShowGameOver] = useState(false);
 
   const onTimeout = useCallback(() => {
-    setDifficulty(null);
+    setShowGameOver(true);
     setShowBell(true);
+    stopTimer();
+    setTimeout(() => {
+      setShowBell(false);
+      setDifficulty(null);
+      setShowGameOver(false);
+    }, 10000);
   }, []);
-  const [timeLeft, resetTimer, startTimer, stopTimer] = useTimer(60, onTimeout);
+
+  const [timeLeft, resetTimer, startTimer, stopTimer] = useTimer(1, onTimeout);
 
   const onVictory = useCallback(() => {
     stopTimer();
@@ -24,6 +32,8 @@ function App() {
     if (difficulty) {
       resetTimer();
       startTimer();
+      setShowBell(false);
+      setShowGameOver(false);
     }
   }, [difficulty, resetTimer, startTimer]);
 
@@ -55,25 +65,27 @@ function App() {
         </div>
       ) : (
         <div className="game-container">
-          <div className="game-board">
+          <div className="game-board-container">
+            <div className="game-board">
+              <Game
+                rows={difficulty[0]}
+                cols={difficulty[1]}
+                timer={{ timeLeft, resetTimer, startTimer, stopTimer }}
+                onVictory={onVictory}
+                onChangeDifficulty={() => setDifficulty(null)}
+              />
+            </div>
             {showBell && (
               <div className="bell-overlay">
                 <img src={bellImage} alt="Campana" />
-                <div className="bell-message">¡Campana y se acabó!</div>
+                <div className="bell-message-container">
+                  <div className="bell-message">¡Campana y se acabó!</div>
+                </div>
               </div>
             )}
-            <Game
-              rows={difficulty[0]}
-              cols={difficulty[1]}
-              timer={{ timeLeft, resetTimer, startTimer, stopTimer }}
-              onVictory={onVictory}
-              onChangeDifficulty={() => setDifficulty(null)}
-            />
           </div>
         </div>
       )}
     </div>
   );
 }
-
-export default App;
