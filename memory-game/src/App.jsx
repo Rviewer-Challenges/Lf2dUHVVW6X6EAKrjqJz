@@ -2,11 +2,14 @@ import React, { useState, useEffect, useCallback } from "react";
 import Game from "./components/Game";
 import useTimer from "./hooks/useTimer";
 import bellImage from "/images/tacañonas.jpg";
+import backgroundImage from "/images/gameplay.jpg";
+import victoryImage from "/images/torrevieja.jpg";
 
 export default function App() {
   const [difficulty, setDifficulty] = useState(null);
   const [showBell, setShowBell] = useState(false);
   const [showGameOver, setShowGameOver] = useState(false);
+  const [showVictory, setShowVictory] = useState(false);
 
   const onTimeout = useCallback(() => {
     setShowGameOver(true);
@@ -19,13 +22,15 @@ export default function App() {
     }, 10000);
   }, []);
 
-  const [timeLeft, resetTimer, startTimer, stopTimer] = useTimer(1, onTimeout);
+  const [timeLeft, resetTimer, startTimer, stopTimer] = useTimer(60, onTimeout);
 
   const onVictory = useCallback(() => {
     stopTimer();
+    setShowVictory(true);
     setTimeout(() => {
-      alert("¡Enhorabuena, has emparejado todas las parejas!");
-    }, 0);
+      setDifficulty(null);
+      setShowVictory(false);
+    }, 10000);
   }, [stopTimer]);
 
   useEffect(() => {
@@ -34,11 +39,17 @@ export default function App() {
       startTimer();
       setShowBell(false);
       setShowGameOver(false);
+      setShowVictory(false);
     }
   }, [difficulty, resetTimer, startTimer]);
 
   return (
     <div className="App">
+      {!difficulty && (
+        <div className="title-container">
+          <h1 className="title">Cards Memory Game</h1>
+        </div>
+      )}
       {!difficulty ? (
         <div className="difficulty-selection-container">
           <div className="difficulty-selection">
@@ -65,6 +76,7 @@ export default function App() {
         </div>
       ) : (
         <div className="game-container">
+          {showGameOver && <div className="game-over-message">Game over</div>}
           <div className="game-board-container">
             <div className="game-board">
               <Game
@@ -81,6 +93,16 @@ export default function App() {
                 <div className="bell-message-container">
                   <div className="bell-message">¡Campana y se acabó!</div>
                 </div>
+              </div>
+            )}
+            {showVictory && (
+              <div className="victory-overlay">
+                <div className="victory-message-container">
+                  <div className="victory-message">
+                    Congratulations!! ¡El apartamiento en Torrevieja!
+                  </div>
+                </div>
+                <img src={victoryImage} alt="Torrevieja" />
               </div>
             )}
           </div>
