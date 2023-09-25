@@ -61,20 +61,24 @@ describe("Board Component", () => {
 
   test("Should not accept negative numbers or zero", () => {
     expect(() => {
-      render(<Board rows={-1} cols={4} resetTimer={vi.fn()} />);
+      render(
+      
+      <Game rows={-1} cols={4} timer={mockTimer} onVictory={vi.fn()} />);
     }).toThrow(
       "A negative or zero board size? That's possible only in the multiverse!"
     );
 
     expect(() => {
-      render(<Board rows={0} cols={0} resetTimer={vi.fn()} />);
+      render(<Game rows={0} cols={0} resetTimer={vi.fn()} />);
     }).toThrow(
       "A negative or zero board size? That's possible only in the multiverse!"
     );
   });
 
   test("renders the board with the correct number of cards", () => {
-    render(<Board rows={rows} cols={cols} />);
+    render(
+      <Game rows={rows} cols={cols} timer={mockTimer} onVictory={vi.fn()} />
+    );
     const cards = screen.getAllByTestId(/card-\d+/);
     expect(cards).toHaveLength(rows * cols);
   });
@@ -84,7 +88,9 @@ describe("Board Component", () => {
     const numberOfRuns = 100;
 
     for (let run = 0; run < numberOfRuns; run++) {
-      render(<Board rows={4} cols={4} />);
+      render(
+        <Game rows={rows} cols={cols} timer={mockTimer} onVictory={vi.fn()} />
+      );
       const cards = screen.getAllByTestId(/card-\d+/);
       const cardIds = cards.map((card) => card.getAttribute("data-testid"));
       let sequenceCount = 0;
@@ -107,7 +113,9 @@ describe("Board Component", () => {
   });
 
   test("starts with all cards face down", () => {
-    render(<Board rows={rows} cols={cols} />);
+    render(
+      <Game rows={rows} cols={cols} timer={mockTimer} onVictory={vi.fn()} />
+    );
 
     const cards = screen.getAllByTestId(/card-\d+-\d+/);
     cards.forEach((card) => {
@@ -116,7 +124,10 @@ describe("Board Component", () => {
   });
 
   test("flips a card when clicked", () => {
-    render(<Board rows={rows} cols={cols} />);
+    render(
+      <Game rows={rows} cols={cols} timer={mockTimer} onVictory={vi.fn()} />
+    );
+
     const card = screen.getByTestId("card-2-0");
 
     act(() => {
@@ -128,7 +139,9 @@ describe("Board Component", () => {
   });
 
   test("tracks the number of moves", () => {
-    render(<Board rows={rows} cols={cols} />);
+    render(
+      <Game rows={rows} cols={cols} timer={mockTimer} onVictory={vi.fn()} />
+    );
     const moves = screen.getByText("Moves: 0");
     const card1 = screen.getByTestId("card-7-0");
     const card2 = screen.getByTestId("card-7-1");
@@ -142,7 +155,10 @@ describe("Board Component", () => {
   });
 
   test("it should match pairs when two similar cards are clicked", () => {
-    render(<Board rows={4} cols={4} />);
+    render(
+      <Game rows={rows} cols={cols} timer={mockTimer} onVictory={vi.fn()} />
+    );
+
 
     const cards = screen.getAllByTestId(/^card-1/);
 
@@ -164,7 +180,10 @@ describe("Board Component", () => {
   });
 
   test("cards flip back when two non-matching cards are clicked", () => {
-    render(<Board rows={rows} cols={cols} />);
+    render(
+      <Game rows={rows} cols={cols} timer={mockTimer} onVictory={vi.fn()} />
+    );
+
     const card1 = screen.getByTestId("card-0-0");
     const card2 = screen.getByTestId("card-1-0");
 
@@ -187,7 +206,10 @@ describe("Board Component", () => {
   });
 
   test("cards flip back and forth when two sets of non-matching cards are clicked", () => {
-    render(<Board rows={rows} cols={cols} />);
+    render(
+      <Game rows={rows} cols={cols} timer={mockTimer} onVictory={vi.fn()} />
+    );
+
     const card1 = screen.getByTestId("card-0-0");
     const card2 = screen.getByTestId("card-1-0");
     const card3 = screen.getByTestId("card-0-1");

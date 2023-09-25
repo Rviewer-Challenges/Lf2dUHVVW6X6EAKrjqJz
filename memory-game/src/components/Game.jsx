@@ -3,12 +3,14 @@ import Board from "./Board";
 import GameStats from "./GameStats";
 
 export default function Game({ rows, cols, timer, onVictory }) {
-  const { timeLeft, resetTimer, startTimer, stopTimer, isActive } = timer;
+  
   if (rows <= 0 || cols <= 0) {
     throw new Error(
       "A negative or zero board size? That's possible only in the multiverse!"
     );
   }
+
+  const { timeLeft, resetTimer, startTimer, stopTimer, isActive } = timer;
 
   const [board, setBoard] = useState([]);
   const [flippedCards, setFlippedCards] = useState([]);
